@@ -1,0 +1,10 @@
+﻿  curve.cpp
+C:\Users\arthu\Downloads\cd3bf634c4d7cb6a773c698a4ab3ab72_one_vs\distrib\curve.cpp(91,23): warning C4018: '<': signed/unsigned mismatch
+C:\Users\arthu\Downloads\cd3bf634c4d7cb6a773c698a4ab3ab72_one_vs\distrib\curve.cpp(93,29): warning C4018: '<': signed/unsigned mismatch
+C:\Users\arthu\Downloads\cd3bf634c4d7cb6a773c698a4ab3ab72_one_vs\distrib\curve.cpp(114,23): warning C4018: '<': signed/unsigned mismatch
+C:\Users\arthu\Downloads\cd3bf634c4d7cb6a773c698a4ab3ab72_one_vs\distrib\curve.cpp(163,25): warning C4018: '<': signed/unsigned mismatch
+C:\Users\arthu\Downloads\cd3bf634c4d7cb6a773c698a4ab3ab72_one_vs\distrib\curve.cpp(168,27): warning C4018: '<=': signed/unsigned mismatch
+C:\Users\arthu\Downloads\cd3bf634c4d7cb6a773c698a4ab3ab72_one_vs\distrib\curve.cpp(208,27): warning C4018: '<': signed/unsigned mismatch
+C:\Users\arthu\Downloads\cd3bf634c4d7cb6a773c698a4ab3ab72_one_vs\distrib\curve.cpp(214,27): warning C4018: '<=': signed/unsigned mismatch
+C:\Users\arthu\Downloads\cd3bf634c4d7cb6a773c698a4ab3ab72_one_vs\distrib\curve.cpp(245,17): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
+  one.vcxproj -> C:\Users\arthu\Downloads\cd3bf634c4d7cb6a773c698a4ab3ab72_one_vs\distrib\Debug\one.exe

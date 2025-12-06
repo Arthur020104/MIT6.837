@@ -1,0 +1,17 @@
+﻿  main.cpp
+C:\Users\arthu\OneDrive\Área de Trabalho\185029333d88b45ffc0c15fad80d1d22_zero\main.cpp(104,57): warning C4305: 'initializing': truncation from 'double' to 'GLfloat'
+C:\Users\arthu\OneDrive\Área de Trabalho\185029333d88b45ffc0c15fad80d1d22_zero\main.cpp(105,35): warning C4305: 'initializing': truncation from 'double' to 'GLfloat'
+C:\Users\arthu\OneDrive\Área de Trabalho\185029333d88b45ffc0c15fad80d1d22_zero\main.cpp(106,40): warning C4305: 'initializing': truncation from 'double' to 'GLfloat'
+C:\Users\arthu\OneDrive\Área de Trabalho\185029333d88b45ffc0c15fad80d1d22_zero\main.cpp(106,45): warning C4305: 'initializing': truncation from 'double' to 'GLfloat'
+C:\Users\arthu\OneDrive\Área de Trabalho\185029333d88b45ffc0c15fad80d1d22_zero\main.cpp(107,35): warning C4305: 'initializing': truncation from 'double' to 'GLfloat'
+C:\Users\arthu\OneDrive\Área de Trabalho\185029333d88b45ffc0c15fad80d1d22_zero\main.cpp(107,40): warning C4305: 'initializing': truncation from 'double' to 'GLfloat'
+C:\Users\arthu\OneDrive\Área de Trabalho\185029333d88b45ffc0c15fad80d1d22_zero\main.cpp(107,45): warning C4305: 'initializing': truncation from 'double' to 'GLfloat'
+C:\Users\arthu\OneDrive\Área de Trabalho\185029333d88b45ffc0c15fad80d1d22_zero\main.cpp(108,35): warning C4305: 'initializing': truncation from 'double' to 'GLfloat'
+C:\Users\arthu\OneDrive\Área de Trabalho\185029333d88b45ffc0c15fad80d1d22_zero\main.cpp(108,40): warning C4305: 'initializing': truncation from 'double' to 'GLfloat'
+C:\Users\arthu\OneDrive\Área de Trabalho\185029333d88b45ffc0c15fad80d1d22_zero\main.cpp(108,45): warning C4305: 'initializing': truncation from 'double' to 'GLfloat'
+C:\Users\arthu\OneDrive\Área de Trabalho\185029333d88b45ffc0c15fad80d1d22_zero\main.cpp(198,24): warning C4996: 'fopen': This function or variable may be unsafe. Consider using fopen_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+C:\Users\arthu\OneDrive\Área de Trabalho\185029333d88b45ffc0c15fad80d1d22_zero\main.cpp(216,21): warning C4996: 'sscanf': This function or variable may be unsafe. Consider using sscanf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+C:\Users\arthu\OneDrive\Área de Trabalho\185029333d88b45ffc0c15fad80d1d22_zero\main.cpp(221,21): warning C4996: 'sscanf': This function or variable may be unsafe. Consider using sscanf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+C:\Users\arthu\OneDrive\Área de Trabalho\185029333d88b45ffc0c15fad80d1d22_zero\main.cpp(226,17): warning C4996: 'sscanf': This function or variable may be unsafe. Consider using sscanf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+LINK : warning LNK4075: ignoring '/INCREMENTAL' due to '/OPT:ICF' specification
+  zero.vcxproj -> C:\Users\arthu\OneDrive\Área de Trabalho\185029333d88b45ffc0c15fad80d1d22_zero\Release\zero.exe
