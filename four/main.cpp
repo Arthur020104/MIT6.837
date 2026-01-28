@@ -74,8 +74,7 @@ int main( int argc, char* argv[] )
           p = r.getOrigin() + r.getDirection() * h.getT();
 
           L->getIllumination(p, ldir, lcolor, distance);
-          atenuation = distance == -1 ? 1 : 1.25/(1.0 + 0.001 * distance + 0.0001 * distance * distance);
-          finalColor += h.getMaterial()->Shade(r, h, ldir, lcolor) * atenuation;
+          finalColor += h.getMaterial()->Shade(r, h, ldir, lcolor, distance);
         }
 
         image.SetPixel( i,j, finalColor + ambient * h.getMaterial()->getDiffuseColor(h));

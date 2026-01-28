@@ -76,10 +76,10 @@ public:
         // the direction to the light is the opposite of the
         // direction of the directional light source
     
-		dir = (position-p);
-    distanceToLight = dir.abs();
-		dir = dir/distanceToLight;
-        col = color;
+      dir = (position-p);
+      distanceToLight = dir.abs();
+      dir = dir/distanceToLight;
+      col = color;
     }
 
 private:

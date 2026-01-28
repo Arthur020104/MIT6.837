@@ -28,7 +28,7 @@ public:
   virtual Vector3f getDiffuseColor(Hit &h);
 
   Vector3f Shade( const Ray& ray, const Hit& hit,
-                  const Vector3f& dirToLight, const Vector3f& lightColor );
+                  const Vector3f& dirToLight, const Vector3f& lightColor, const float distance  );
 
   void loadTexture(const char * filename);
  protected:

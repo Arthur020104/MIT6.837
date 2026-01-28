@@ -21,17 +21,23 @@ Vector3f Material::getDiffuseColor(Hit &h)
   
 
 Vector3f Material::Shade( const Ray& ray, const Hit& hit,
-                const Vector3f& dirToLight, const Vector3f& lightColor ) 
+                const Vector3f& dirToLight, const Vector3f& lightColor, const float distance ) 
 {
-  Vector3f r = (ray.getDirection() - 2 * Vector3f::dot(ray.getDirection(), hit.getNormal()) * hit.getNormal()).normalized();
+  Vector3f N = hit.getNormal();
+  Vector3f L = dirToLight.normalized();
+  Vector3f V = -ray.getDirection().normalized();
 
-  float cos = clamp(Vector3f::dot(hit.getNormal(), dirToLight.normalized()), 0.0f, 1.0f);
-  float s = pow(clamp(Vector3f::dot(dirToLight.normalized(), r), 0.0f, 1.0f), shininess);
+  Vector3f r = (-L + 2 * (Vector3f::dot(L, N) * N)).normalized();
+
+  float cos = clamp(Vector3f::dot(N, L), 0.0f, 1.0f);
+  
+  float s = pow(clamp(Vector3f::dot(V, r), 0.0f, 1.0f), shininess);
 
   Vector3f diffuseC = diffuseColor;
   if(hit.hasTex && t.valid())
     diffuseC = t(hit.texCoord.x(),hit.texCoord.y());
-  return ((lightColor * cos *  diffuseC) + (lightColor * s * specularColor));
+
+  return (( cos *  diffuseC) + (s * specularColor)) * (distance == -1 || distance == 0 ? lightColor : lightColor * 3/(2.3 + 0.01 * distance + 0.0001 * distance * distance));
 
   
 }
