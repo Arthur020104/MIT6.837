@@ -30,6 +30,7 @@ public:
 
   int getGroupSize();
 
+  void loadBvh();
  private:
   std::vector<Object3D*> objs;
   

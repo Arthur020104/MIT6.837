@@ -14,7 +14,7 @@ public:
   ~Transform(){
   }
   virtual bool intersect( const Ray& r , Hit& h , float tmin);
-
+  void loadBvh();
  protected:
   Object3D* o; //un-transformed object	
   Matrix4f ivM;

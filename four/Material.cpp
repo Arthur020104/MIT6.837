@@ -29,9 +29,9 @@ Vector3f Material::Shade( const Ray& ray, const Hit& hit,
 
   Vector3f r = (-L + 2 * (Vector3f::dot(L, N) * N)).normalized();
 
-  float cos = clamp(Vector3f::dot(N, L), 0.0f, 1.0f);
+  float cos = max(Vector3f::dot(N, L), 0.0f);
   
-  float s = pow(clamp(Vector3f::dot(V, r), 0.0f, 1.0f), shininess);
+  float s = pow(max(Vector3f::dot(V, r), 0.0f), shininess);
 
   Vector3f diffuseC = diffuseColor;
   if(hit.hasTex && t.valid())

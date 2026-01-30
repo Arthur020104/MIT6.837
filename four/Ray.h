@@ -16,12 +16,18 @@ public:
     {
         origin = orig; 
         direction = dir;
+        invDrx = 1.0f/dir.x();
+        invDry = 1.0f/dir.y();
+        invDrz = 1.0f/dir.z();
     }
 
     Ray( const Ray& r )
     { 
         origin = r.origin;
         direction = r.direction;
+        invDrx = r.invDrx;
+        invDry = r.invDry;
+        invDrz = r.invDrz;
     }
 
     const Vector3f& getOrigin() const
@@ -38,7 +44,10 @@ public:
     {
         return origin + direction * t;
     }
-
+  
+  float invDrx;
+  float invDry;
+  float invDrz;
 private:
 
     // don't use this constructor
@@ -49,6 +58,7 @@ private:
 
     Vector3f origin;
     Vector3f direction;
+    
 
 };
 

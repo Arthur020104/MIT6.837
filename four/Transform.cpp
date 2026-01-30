@@ -7,6 +7,7 @@ Transform::Transform( const Matrix4f& m, Object3D* obj ):o(obj)
 {
   ivM = m.inverse();
   this->m = m;
+  this->hasBv = false;
 }
 bool Transform::intersect( const Ray& r , Hit& h , float tmin)
 {
@@ -26,4 +27,8 @@ bool Transform::intersect( const Ray& r , Hit& h , float tmin)
     h.set(h.getT(), h.getMaterial(), normal.xyz().normalized());
   } 
   return result;
+}
+void Transform::loadBvh()
+{
+  o->loadBvh();
 }

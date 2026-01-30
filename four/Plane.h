@@ -14,7 +14,7 @@ public:
 	Plane( const Vector3f& normal , float d , Material* m);
 	~Plane(){}
 	virtual bool intersect( const Ray& r , Hit& h , float tmin);
-
+  void loadBvh();
   float d;
   Vector3f normal;
 protected:

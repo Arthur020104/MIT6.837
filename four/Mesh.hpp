@@ -16,12 +16,18 @@ struct Trig{
 class Mesh:public Object3D{
 public:
   Mesh(const char * filename, Material* m);
+  ~Mesh();
   std::vector<Vector3f>v;
   std::vector<Trig>t;
   std::vector<Vector3f>n;
   std::vector<Vector2f>texCoord; 
-
+  void destructorHelper(BVH* bvh);
+  void initializeBVH(BVH* bvh, int depth);
+  void loadBvh();
   virtual bool intersect( const Ray& r , Hit& h , float tmin );
+
+  //TODO criar um metodo para criar um triangulo e retornalo a partir de index para t 
+  //tera um overload de retorno para que um retorne um triangulo na stack e outro na heap(ponteiro)
 private:
   void compute_norm();
 };

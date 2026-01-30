@@ -4,6 +4,11 @@
 #include <cmath>
 
 bool Sphere::intersect( const Ray& r , Hit& h , float tmin) {
+ // std::cout<<"on sphere intersect\n";
+
+  float infinity = INFINITY;
+  if(this->hasBv && bvh.intersectBv(r, tmin, infinity).empty())
+    return false;
 
   Vector3f o = this->center - r.getOrigin();
 
@@ -33,4 +38,16 @@ bool Sphere::intersect( const Ray& r , Hit& h , float tmin) {
   }
   
   return best != INFINITY;
+}
+void Sphere::loadBvh()
+{
+  Vector3f min  = center - Vector3f(radius, radius, radius);
+  Vector3f max = center + Vector3f(radius, radius, radius);
+
+  std::vector<Object3D*> thisObj;
+  thisObj.push_back(this);
+  bvh = BVH(true, min, max, thisObj);
+
+  hasBv = true;
+   
 }

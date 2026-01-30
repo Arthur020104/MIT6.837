@@ -36,6 +36,8 @@ int main( int argc, char* argv[] )
   float wf = 1.0f/((float)W - 1.0f);
   float hf = 1.0f/((float)H - 1.0f);
 	SceneParser sceneParser(filename);
+  //sceneParser.getGroup()->loadBvh();
+
 
   Image image( W , H );
   Ray r = Ray(Vector3f(0.0f, 0.0f, 0.0f), Vector3f(0.0f, 0.0f, 0.0f));
@@ -48,6 +50,7 @@ int main( int argc, char* argv[] )
   
   float atenuation;
   
+
   Vector3f ambient = CA * sceneParser.getAmbientLight();
   for(float i = 0; i < W; i++)
   {
@@ -65,7 +68,6 @@ int main( int argc, char* argv[] )
       bool t = sceneParser.getGroup()->intersect(r, h,sceneParser.getCamera()->getTMin());
       if(t)
       {
-        float cos = clamp(Vector3f::dot(ldir, h.getNormal()), 0.0f, 1.0f);
         Vector3f finalColor = Vector3f(0.0f, 0.0f, 0.0f);
         float distance = -1;
         for(size_t l = 0; l < sceneParser.getNumLights();l++)
