@@ -36,7 +36,7 @@ int main( int argc, char* argv[] )
   float wf = 1.0f/((float)W - 1.0f);
   float hf = 1.0f/((float)H - 1.0f);
 	SceneParser sceneParser(filename);
-  //sceneParser.getGroup()->loadBvh();
+  sceneParser.getGroup()->loadBvh();
 
 
   Image image( W , H );
