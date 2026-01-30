@@ -15,18 +15,29 @@ bool Transform::intersect( const Ray& r , Hit& h , float tmin)
   Vector4f oT = this->ivM * Vector4f(r.getOrigin(), 1.0f);
   Vector4f dT = this->ivM * Vector4f(r.getDirection(), 0.0f);
   
+  float scale = dT.xyz().abs();
   Ray ray = Ray(oT.xyz(), dT.xyz().normalized());
 
-  float prev = h.getT();
+  Hit lh = Hit();
 
-  bool result = o->intersect( ray , h , tmin);
 
-  if(h.getT() != prev)
+  if(o->intersect( ray , lh , tmin * scale))
   { 
-    Vector4f normal = ivM.transposed() * Vector4f(h.getNormal(), 0.0f);
-    h.set(h.getT(), h.getMaterial(), normal.xyz().normalized());
+    float nt = lh.getT() / scale;
+
+    if(nt < h.getT())
+    {
+      Vector4f normal = ivM.transposed() * Vector4f(lh.getNormal(), 0.0f);
+      h.set(nt, lh.getMaterial(), normal.xyz().normalized());
+      h.hasTex = lh.hasTex;
+      h.texCoord = lh.texCoord;
+      
+      return true;
+    
+    }
+    
   } 
-  return result;
+  return false;
 }
 void Transform::loadBvh()
 {

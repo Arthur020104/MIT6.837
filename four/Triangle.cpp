@@ -42,6 +42,7 @@ bool Triangle::intersect( const Ray& r,  Hit& hit , float tmin){
       Vector3f normalf = (alpha * normals[0] + beta * normals[1] + gamma * normals[2]).normalized();
       Vector2f texCoord =  alpha * texCoords[0] + beta * texCoords[1] + gamma * texCoords[2];
       hit.set(t, material, normalf);
+      
       if(hasTex)
         hit.setTexCoord(texCoord);
     }
