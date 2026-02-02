@@ -33,7 +33,7 @@ void getXy(const float &i, const float &j, const float &wf, const float &hf, con
 
 Vector3f& safeImgAcess(Vector3f* imageBuffer, const int &W, const int &H, const int &i, const int &j);
 
-void threadTraceRay(float i, int H, int W, float wf, float hf, float ratio, Vector3f* imageBuffer, SceneParser& sceneParser);
+void threadTraceRay(int i, int H, int W, float wf, float hf, float ratio, Vector3f* imageBuffer, SceneParser& sceneParser);
 
 int main( int argc, char* argv[] )
 {
@@ -91,7 +91,7 @@ int main( int argc, char* argv[] )
  
   Vector3f* imageBuffer = new Vector3f[W * H];
 
-  for(float i = 0; i < W; i++)
+  for(int i = 0; i < W; i++)
   {
     while(IN_USE_THREADS >= TOTAL_THREADS) 
     {
@@ -132,7 +132,6 @@ int main( int argc, char* argv[] )
   }
   if(GAUSSIAN)
   {
-    //downsample
     Vector3f* img = new Vector3f[FW * FH];
     for(int i = 0; i < FW; i++)
     {
@@ -214,12 +213,12 @@ Vector3f& safeImgAcess(Vector3f* imageBuffer, const int &W, const int &H, const 
 
   return imageBuffer[iIdx + jIdx * W];
 }
-void threadTraceRay(float i, int H, int W, float wf, float hf, float ratio, Vector3f* imageBuffer, SceneParser& sceneParser)
+void threadTraceRay(int i, int H, int W, float wf, float hf, float ratio, Vector3f* imageBuffer, SceneParser& sceneParser)
 {
   std::random_device rd;
   std::mt19937 gen(rd());
   std::uniform_real_distribution<float> rndDist(-0.5, 0.5);
-  for(float j = 0; j < H; j++)
+  for(int j = 0; j < H; j++)
   {
     Hit h = Hit();
     float x, y;
@@ -232,7 +231,7 @@ void threadTraceRay(float i, int H, int W, float wf, float hf, float ratio, Vect
 
     Vector3f finalColor = RayTracer::traceRay(r, sceneParser,  1 + BOUNCES, SHADOWS );
 
-    imageBuffer[(int)(i + j * W)] = finalColor;
+    imageBuffer[i + j * W] = finalColor;
   }
   IN_USE_THREADS --;
 
