@@ -1,6 +1,6 @@
 #include "RayTracer.h"
 
-Vector3f RayTracer::traceRay(Ray& r, SceneParser& scene, int depth)
+Vector3f RayTracer::traceRay(Ray& r, SceneParser& scene, int depth, bool castShadows)
 {
   float tmin = 10e-5;
   if(depth == 0)
@@ -52,7 +52,7 @@ Vector3f RayTracer::traceRay(Ray& r, SceneParser& scene, int depth)
       Ray refracRay(P + refractionvec * tmin, refractionvec);
       refracRay.refraction = nt;
 
-      refracColor = traceRay(refracRay, scene, depth-1);
+      refracColor = traceRay(refracRay, scene, depth-1, castShadows);
 
       float R0 = pow((nt - n) / (nt + n), 2.0f);
       float c;
@@ -69,7 +69,7 @@ Vector3f RayTracer::traceRay(Ray& r, SceneParser& scene, int depth)
       finalColor += refracColor * (1.0f - rContrib) * h.getMaterial()->getSpecular();
     }
     
-    reflectionColor = traceRay(reflectionRay, scene, depth-1) * h.getMaterial()->getSpecular();
+    reflectionColor = traceRay(reflectionRay, scene, depth-1, castShadows) * h.getMaterial()->getSpecular();
     
     
 
@@ -82,13 +82,17 @@ Vector3f RayTracer::traceRay(Ray& r, SceneParser& scene, int depth)
 
       L->getIllumination(P, ldir, lcolor, distance);
 
-      //if(Vector3f::dot(N, ldir.normalized()) < 0) talvez usar isso para evitar fazer cast de shadow rays
-      Hit shadowHit = Hit(distance + tmin , NULL, NULL);//mover alocacao pra cima, so sobreescrever
-      Ray rShadow = Ray(P + ldir * tmin, ldir);
+      if(castShadows)
+      {
+        Hit shadowHit = Hit(distance + tmin , NULL, NULL);
+        Ray rShadow = Ray(P + ldir * tmin, ldir);
 
-      bool tShadow = scene.getGroup()->intersect(rShadow, shadowHit, tmin);
-    
-      if(!tShadow || shadowHit.getT() > distance)
+        bool tShadow = scene.getGroup()->intersect(rShadow, shadowHit, tmin);
+      
+        if(!tShadow || shadowHit.getT() > distance)
+          finalColor += h.getMaterial()->Shade(r, h, ldir, lcolor, distance);
+      }
+      else
         finalColor += h.getMaterial()->Shade(r, h, ldir, lcolor, distance);
     }
 

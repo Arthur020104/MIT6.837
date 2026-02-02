@@ -7,8 +7,6 @@
 #include "Ray.h"
 #include "Hit.h"
 #include "SceneParser.h"
-///TODO:
-///Implement Shade function that uses ambient, diffuse, specular and texture
 class RayTracer
 {
 public:
@@ -20,7 +18,7 @@ public:
 
   }
 
-  static Vector3f traceRay(Ray& r, SceneParser& scene, int depth);
+  static Vector3f traceRay(Ray& r, SceneParser& scene, int depth, bool castShadows);
  
  protected:
   

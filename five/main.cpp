@@ -10,41 +10,40 @@
 #include "Camera.h"
 #include <string.h>
 #include <random>
+#include <thread>
+#include <functional> 
+#include <atomic>     
 #include "bitmap_image.hpp"
 #include "RayTracer.h"
 using namespace std;
 
+const unsigned int TOTAL_THREADS = std::thread::hardware_concurrency();
+std::atomic<int> IN_USE_THREADS(0);
+
+bool JITTER = false;
+bool GAUSSIAN = false;
+bool SHADOWS = false;
+int BOUNCES = 0;
+
 float clampedDepth ( float depthInput, float depthMin , float depthMax);
+
 bool readInput(int &argc, char* argv[], char* &filename, char* &newFileName, int& W, int& H) ;
 
+void getXy(const float &i, const float &j, const float &wf, const float &hf, const float &ratio, float &x, float &y);
 
-const float CA = 1.1f;
+Vector3f& safeImgAcess(Vector3f* imageBuffer, const int &W, const int &H, const int &i, const int &j);
 
-void getXy(const float &i, const float &j, const float &wf, const float &hf, const float &ratio, float &x, float &y)
-{
-  float xr = i * wf;
-  float yr = j * hf;
-  x = (xr - (1.0f - xr)) * ratio;
-  y = yr - (1.0f - yr);
-}
-Vector3f& safeImgAcess(Vector3f* imageBuffer, const int &W, const int &H, const int &i, const int &j)
-{
-  int iIdx = i;
-  int jIdx = j;
-  if(i >= W)
-    iIdx = W-1;
-  else if(i < 0)
-    iIdx = 0;
-  
-  if(j >= H)
-    jIdx = H-1;
-  else if(j < 0)
-    jIdx = 0;
+void threadTraceRay(float i, int H, int W, float wf, float hf, float ratio, Vector3f* imageBuffer, SceneParser& sceneParser);
 
-  return imageBuffer[iIdx + jIdx * W];
-}
 int main( int argc, char* argv[] )
 {
+  
+  if(TOTAL_THREADS <= 0)//por agora so
+  {
+    std::cerr<<"Must support mutiple threads"<<std::endl;
+    return -1;
+  }
+  
   // Fill in your implementation here.
 
   // This loop loops over each of the input arguments.
@@ -58,15 +57,23 @@ int main( int argc, char* argv[] )
   if(!readInput(argc, argv, filename, newFileName, W, H))
     return 0;
 
-  bool jitter = true;
+  
   int FW;
   int FH;
-  if(jitter)
+  if(JITTER)
   {
-    FW = W;
-    FH = H;//chagnge afther just for jitter
     W *= 3;
     H *= 3;
+  }
+  if(GAUSSIAN)
+  {
+    FW = W / 3.0f;
+    FH = H / 3.0f;
+  }
+  else
+  {
+    FW = W;
+    FH = H;
   }
   
   float ratio = (float)W/(float)H;
@@ -82,33 +89,24 @@ int main( int argc, char* argv[] )
   Ray r = Ray(Vector3f(0.0f, 0.0f, 0.0f), Vector3f(0.0f, 0.0f, 0.0f));
 
  
-  // Vector3f ldir;
-  // Vector3f lcolor;
-  // Light* L;
-  // Vector3f p;
-  std::random_device rd;
-  std::mt19937 gen(rd());
-  std::uniform_real_distribution<float> rndDist(-0.5, 0.5);
-
-  float atenuation;
   Vector3f* imageBuffer = new Vector3f[W * H];
 
-  Vector3f ambient = CA * sceneParser.getAmbientLight();
   for(float i = 0; i < W; i++)
   {
-    for(float j = 0; j < H; j++)
+    while(IN_USE_THREADS >= TOTAL_THREADS) 
     {
-      Hit h = Hit();
-      float x, y;
-
-      getXy(i + rndDist(gen), j + rndDist(gen), wf, hf, ratio, x, y);    
-      r = sceneParser.getCamera()->generateRay(Vector2f(x, -y));
-      Vector3f finalColor = RayTracer::traceRay(r, sceneParser,  5 );//1 + bounces
-
-      imageBuffer[(int)(i + j * W)] = finalColor;
+      std::this_thread::yield();
     }
+
+    IN_USE_THREADS++;
+    std::thread t1(threadTraceRay, i, H, W, wf, hf, ratio, imageBuffer, std::ref(sceneParser));
+    t1.detach();
   }
-  bool gaussian = true;
+  while(IN_USE_THREADS > 0) 
+  {
+    std::this_thread::yield();
+  }
+  
 
   float K[5] = {0.1201f, 0.2339f, 0.2931f, 0.2339f, 0.1201f};
   for(int i = 0; i < W; i++)
@@ -116,7 +114,7 @@ int main( int argc, char* argv[] )
     for(int j = 0; j < H; j++)
     { 
       
-      if(gaussian)
+      if(GAUSSIAN)
       { 
         imageBuffer[(int)(i + j * W)] = safeImgAcess(imageBuffer, W, H, i, j - 2) * K[0]
         + safeImgAcess(imageBuffer, W, H, i, j - 1) * K[1]
@@ -132,8 +130,7 @@ int main( int argc, char* argv[] )
       
     }
   }
-  gaussian = true;
-  if(gaussian)
+  if(GAUSSIAN)
   {
     //downsample
     Vector3f* img = new Vector3f[FW * FH];
@@ -176,6 +173,14 @@ bool readInput(int &argc, char* argv[], char* &filename, char* &newFileName, int
     }
     if(strcmp("-output", argv[argNum]) == 0)
       newFileName = argv[argNum+1];
+    if(strcmp("-jitter", argv[argNum]) == 0)
+      JITTER = true;
+    if(strcmp("-filter", argv[argNum]) == 0)
+      GAUSSIAN = true;
+    if(strcmp("-bounces", argv[argNum]) == 0)
+      BOUNCES = atoi(argv[argNum+1]);
+    if(strcmp("-shadows", argv[argNum]) == 0)
+      SHADOWS = true;
   }
 
   if(W == -1 || H == -1 || filename == nullptr || newFileName == nullptr)
@@ -186,3 +191,49 @@ bool readInput(int &argc, char* argv[], char* &filename, char* &newFileName, int
   return true;
 }
 
+void getXy(const float &i, const float &j, const float &wf, const float &hf, const float &ratio, float &x, float &y)
+{
+  float xr = i * wf;
+  float yr = j * hf;
+  x = (xr - (1.0f - xr)) * ratio;
+  y = yr - (1.0f - yr);
+}
+Vector3f& safeImgAcess(Vector3f* imageBuffer, const int &W, const int &H, const int &i, const int &j)
+{
+  int iIdx = i;
+  int jIdx = j;
+  if(i >= W)
+    iIdx = W-1;
+  else if(i < 0)
+    iIdx = 0;
+  
+  if(j >= H)
+    jIdx = H-1;
+  else if(j < 0)
+    jIdx = 0;
+
+  return imageBuffer[iIdx + jIdx * W];
+}
+void threadTraceRay(float i, int H, int W, float wf, float hf, float ratio, Vector3f* imageBuffer, SceneParser& sceneParser)
+{
+  std::random_device rd;
+  std::mt19937 gen(rd());
+  std::uniform_real_distribution<float> rndDist(-0.5, 0.5);
+  for(float j = 0; j < H; j++)
+  {
+    Hit h = Hit();
+    float x, y;
+    
+    if(JITTER)
+      getXy(i + rndDist(gen), j + rndDist(gen), wf, hf, ratio, x, y);
+    else
+      getXy(i, j, wf, hf, ratio, x, y);
+    Ray r = sceneParser.getCamera()->generateRay(Vector2f(x, -y));
+
+    Vector3f finalColor = RayTracer::traceRay(r, sceneParser,  1 + BOUNCES, SHADOWS );
+
+    imageBuffer[(int)(i + j * W)] = finalColor;
+  }
+  IN_USE_THREADS --;
+
+}
