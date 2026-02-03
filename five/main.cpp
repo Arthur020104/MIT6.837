@@ -86,10 +86,11 @@ int main( int argc, char* argv[] )
 
 
   Image image( FW , FH );
-  Ray r = Ray(Vector3f(0.0f, 0.0f, 0.0f), Vector3f(0.0f, 0.0f, 0.0f));
 
  
   Vector3f* imageBuffer = new Vector3f[W * H];
+
+  int delay = 50;//ta em ms
 
   for(int i = 0; i < W; i++)
   {
@@ -98,25 +99,46 @@ int main( int argc, char* argv[] )
       std::this_thread::yield();
     }
 
-    IN_USE_THREADS++;
-    std::thread t1(threadTraceRay, i, H, W, wf, hf, ratio, imageBuffer, std::ref(sceneParser));
-    t1.detach();
+    int counter = 0;
+    while(true)//talvez colocar isso em uma funcao, 
+    {
+      try
+      {
+        std::thread t1(threadTraceRay, i, H, W, wf, hf, ratio, imageBuffer, std::ref(sceneParser));
+        t1.detach();
+        IN_USE_THREADS++;
+        break;
+      }
+      catch(...)
+      {
+        counter++;
+
+        std::this_thread::sleep_for(std::chrono::milliseconds(delay * counter));
+      }
+    }
+    
+
+    std::cout << "Started Thread column: " << i <<"/" << W << ". Amount of threads in use: " << IN_USE_THREADS.load() << std::endl;
   }
   while(IN_USE_THREADS > 0) 
   {
     std::this_thread::yield();
   }
   
+  Vector3f* filteredImg;
+
+  if(GAUSSIAN)
+    filteredImg = new Vector3f[W * H];
+
 
   float K[5] = {0.1201f, 0.2339f, 0.2931f, 0.2339f, 0.1201f};
   for(int i = 0; i < W; i++)
   {
     for(int j = 0; j < H; j++)
     { 
-      
-      if(GAUSSIAN)
-      { 
-        imageBuffer[(int)(i + j * W)] = safeImgAcess(imageBuffer, W, H, i, j - 2) * K[0]
+      if(GAUSSIAN)//blur horizontal
+      {
+        filteredImg[(int)(i + j * W)] = safeImgAcess(imageBuffer, W, H, i, j - 2) * K[0]
         + safeImgAcess(imageBuffer, W, H, i, j - 1) * K[1]
         + safeImgAcess(imageBuffer, W, H, i, j) * K[2]
         + safeImgAcess(imageBuffer, W, H, i, j + 1) * K[3]
@@ -132,23 +154,37 @@ int main( int argc, char* argv[] )
   }
   if(GAUSSIAN)
   {
+    //blur vertical
+    for(int j = 0; j < H; j++)
+    {
+      for(int i = 0; i < W; i++)
+      { 
+        filteredImg[(int)(i + j * W)] = safeImgAcess(imageBuffer, W, H, i - 2, j) * K[0]
+        + safeImgAcess(imageBuffer, W, H, i - 1, j) * K[1]
+        + safeImgAcess(imageBuffer, W, H, i, j) * K[2]
+        + safeImgAcess(imageBuffer, W, H, i + 1, j) * K[3]
+        + safeImgAcess(imageBuffer, W, H, i + 2, j) * K[4];
+      }
+    }
+
     Vector3f* img = new Vector3f[FW * FH];
     for(int i = 0; i < FW; i++)
     {
       for(int j = 0; j < FH; j++)
       {
         Vector3f finalColor;
-        finalColor += safeImgAcess(imageBuffer, W, H, i * 3, j * 3);
-        finalColor += safeImgAcess(imageBuffer, W, H, i * 3 + 1, j * 3);
-        finalColor += safeImgAcess(imageBuffer, W, H, i * 3, j * 3 + 1);
-        finalColor += safeImgAcess(imageBuffer, W, H, i * 3 - 1, j * 3);
-        finalColor += safeImgAcess(imageBuffer, W, H, i * 3, j * 3 - 1);
+        finalColor += safeImgAcess(filteredImg, W, H, i * 3, j * 3);
+        finalColor += safeImgAcess(filteredImg, W, H, i * 3 + 1, j * 3);
+        finalColor += safeImgAcess(filteredImg, W, H, i * 3, j * 3 + 1);
+        finalColor += safeImgAcess(filteredImg, W, H, i * 3 - 1, j * 3);
+        finalColor += safeImgAcess(filteredImg, W, H, i * 3, j * 3 - 1);
 
         finalColor = finalColor / 5.0f;
         image.SetPixel(i, j, finalColor);
       }
     }
     delete[] img;
+    delete[] filteredImg;
   }
 
   image.SaveImage(newFileName);
